@@ -1,3 +1,7 @@
 import { defineConfig } from "../src";
 
-export default defineConfig()
+import MarkdownHandler from "../src/handlers/MarkdownHandler";
+
+export default defineConfig({
+  handlers: [new MarkdownHandler()]
+})
