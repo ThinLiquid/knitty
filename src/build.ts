@@ -14,7 +14,7 @@ const {
 
 const pages = await glob(`src/pages/**/*`);
 
-await fs.mkdir("dist", { recursive: true });
+await fs.mkdir(config.outputDirectory, { recursive: true });
 
 const handleLayout = async (frontmatter: Record<string, any>, code: string) => {
   const raw_layout = await fs.readFile(
@@ -43,8 +43,8 @@ for (const pagePath of pages) {
 
   fs.writeFile(
     path.join(
-      "dist",
-      pagePath.replace("src/pages/", "").replace(fileExtension, "html")
+      config.outputDirectory,
+      pagePath.replace("src/pages/", "").replace("src\\pages\\", "").replace(fileExtension, "html")
     ),
     await handleLayout(output.frontmatter, output.compiledCode)
   );
