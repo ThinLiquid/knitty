@@ -2,6 +2,8 @@ import fs from "fs/promises";
 import path from "path";
 import { glob } from "glob";
 
+import chalk from "chalk";
+
 import type { IKnittyConfig } from ".";
 
 const currentDirectory = process.cwd();
@@ -21,8 +23,12 @@ const handleLayout = async (frontmatter: Record<string, any>, code: string) => {
     path.join("src/_includes", frontmatter.layout),
     "utf-8"
   );
-  return raw_layout.replace("<!-- use-var:content -->", code);
+
+  return raw_layout.replace(/\{\s*(.*?)\s*\}/g, (_, variable) => frontmatter[variable] || code);
 };
+
+const startTime = new Date();
+console.log(chalk.cyan("[KNIT] Building website!"))
 
 // Process each page file
 for (const pagePath of pages) {
@@ -48,8 +54,13 @@ for (const pagePath of pages) {
     ),
     await handleLayout(output.frontmatter, output.compiledCode)
   );
+  console.log(chalk.cyan(`[KNIT] Wrote ${pagePath}`))
 }
 
+// Imports entire public folder into build folder
 if (await fs.exists(config.publicFolder)) {
   fs.cp(config.publicFolder, config.outputDirectory, { recursive: true });
+  console.log(chalk.cyan(`[KNIT] Wrote ${config.publicFolder} to ${config.outputDirectory}`))
 }
+
+console.log(chalk.cyan(`[KNIT] Finished building website in ${(new Date().getTime() - startTime.getTime()) / 100}s`))
